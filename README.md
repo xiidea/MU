@@ -20,13 +20,20 @@ USES
 The first parameter of Constructor is essential $f_resource
 
 initiate with just $_FILE object
+
+```php
     $var_ref = new MU($_FILES['file1']);
-
+```
 initiate with $_FILE object and a base name for upload file
-    $var_ref = new MU($_FILES['file1'],'file');
 
+```php
+    $var_ref = new MU($_FILES['file1'],'file');
+```
 you can also provide a base counting no for multiple upload field. The counter will start from $n
+
+```php
     $var_ref = new MU($_FILES['file1'],'file',$n);
+```
 
 
 TODO
