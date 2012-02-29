@@ -29,6 +29,11 @@ you can also provide a base counting no for multiple upload field. The counter w
     $var_ref = new MU($_FILES['file1'],'file',$n);
 
 
+TODO
+====
+* Over write handeler will be added
+* File name unifier will be added
+
 Dependencies
 ============
 The Library has no known dependency and should work on any server runs php 

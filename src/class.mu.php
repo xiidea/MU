@@ -113,7 +113,7 @@ class MU{		//MULTIPLE UPLOAD
      * array to store all errors occured on uploading
      * @var array
      */
-    private $errors					=array();
+    private $errors					=array('TRUE','extention not allowed','Directory is inaccessible','probably upload attac!','no file to upload');
 
     /**
      * One time flag variable to use auto detect if the passed value is multiple or not
@@ -140,58 +140,62 @@ class MU{		//MULTIPLE UPLOAD
      * @param int $base_count start count for multiple file upload
      */
     function __construct($f_resource,$base_name="",$base_count=0){
-		
-		$this->errors=array('TRUE','extention not allowed','Directory is inaccessible','probably upload attac!','no file to upload');	//DIFFERENT ERRORS
+        $this->init($f_resource,$base_name,$base_count);
+	}
 
-		$this->isMultiple=(is_array($f_resource['name']));
-		
-		if(isset($f_resource['name']))
-			$this->file_count=count($f_resource['name']);		
-		
-		
-		
-		if($this->file_count>0){
-			for($i=0; $i<$this->file_count; $i++){				
-				if($base_name=='' && $this->UseRandomName){         //If no base name provided use random file name
-						list($usec, $sec) = explode(' ', microtime());
-						$seed= (float) $sec + ((float) $usec * 100000);
-						srand($seed);
-						$randval = rand();	
-						$base_name=md5($randval.date('Y-m-d'));
-						}
+
+    /**
+     * Initialize class
+     * @param string $f_resource the file input resource
+     * @param string $base_name base name for uploaded files
+     * @param int $base_count start count for multiple file upload
+     */
+    function init($f_resource,$base_name="",$base_count=0){
+        $this->isMultiple=(is_array($f_resource['name']));
+
+        if(isset($f_resource['name'])){
+            $this->file_count=count($f_resource['name']);
+        }
+
+        if($this->file_count>0){
+            for($i=0; $i<$this->file_count; $i++){
+                if($base_name=='' && $this->UseRandomName){         //If no base name provided use random file name
+                    list($usec, $sec) = explode(' ', microtime());
+                    $seed= (float) $sec + ((float) $usec * 100000);
+                    srand($seed);
+                    $randval = rand();
+                    $base_name=md5($randval.date('Y-m-d'));
+                }
 
                 $base_file_name=($base_name=="")?"":$base_name."_".($i+$base_count);
-				if($this->isMultiple){
-					$this->file_resource=$f_resource;
-					if($f_resource['name'][$i]!='')
-						$this->file_selected++;
-					$this->source_file_names[$i]=$f_resource['name'][$i];
-					$this->target_file_names[$i]=$base_file_name;
-					$this->extenssions[$i]=strrchr($f_resource['name'][$i],'.');
-					$this->file_sizes[$i]=$f_resource['size'][$i];
-				}
-				else
-					{
-					$this->file_resource['name'][0]=$f_resource['name'];
-					$this->file_resource['type'][0]=$f_resource['type'];
-					$this->file_resource['tmp_name'][0]=$f_resource['tmp_name'];
-					$this->file_resource['error'][0]=$f_resource['error'];
-					$this->file_resource['size'][0]=$f_resource['size'];
-					
-					if($f_resource['name']!='')
-						$this->file_selected++;
-					$this->source_file_names[$i]=$f_resource['name'];
-					$this->target_file_names[$i]=$base_file_name;
-					$this->extenssions[$i]=strrchr($f_resource['name'],'.');
-					$this->file_sizes[$i]=$f_resource['size'];
-					}
-			}
-			
-		}
-	}
-	
+                if($this->isMultiple){
+                    $this->file_resource=$f_resource;
+                    if($f_resource['name'][$i]!='')
+                        $this->file_selected++;
+                    $this->source_file_names[$i]=$f_resource['name'][$i];
+                    $this->target_file_names[$i]=$base_file_name;
+                    $this->extenssions[$i]=strrchr($f_resource['name'][$i],'.');
+                    $this->file_sizes[$i]=$f_resource['size'][$i];
+                }
+                else
+                {
+                    $this->file_resource['name'][0]=$f_resource['name'];
+                    $this->file_resource['type'][0]=$f_resource['type'];
+                    $this->file_resource['tmp_name'][0]=$f_resource['tmp_name'];
+                    $this->file_resource['error'][0]=$f_resource['error'];
+                    $this->file_resource['size'][0]=$f_resource['size'];
 
-	
+                    if($f_resource['name']!='')
+                        $this->file_selected++;
+                    $this->source_file_names[$i]=$f_resource['name'];
+                    $this->target_file_names[$i]=$base_file_name;
+                    $this->extenssions[$i]=strrchr($f_resource['name'],'.');
+                    $this->file_sizes[$i]=$f_resource['size'];
+                }
+            }
+
+        }
+    }
   /////////////////////////////////////////////////
   // METHODS, VARIABLES
   /////////////////////////////////////////////////
