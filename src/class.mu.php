@@ -61,7 +61,7 @@ class MU{		//MULTIPLE UPLOAD
    * array of target file names without extention.
    * @var string array '
    */	
-	public $target_file_names;
+	private $target_file_names;
 
   /////////////////////////////////////////////////
   // PROPERTIES, PRIVATE
@@ -139,7 +139,7 @@ class MU{		//MULTIPLE UPLOAD
      * @param string $base_name base name for uploaded files
      * @param int $base_count start count for multiple file upload
      */
-    function __construct($f_resource,$base_name="",$base_count=0){
+    function __construct($f_resource,$base_name=null,$base_count=0){
         $this->init($f_resource,$base_name,$base_count);
 	}
 
@@ -158,15 +158,15 @@ class MU{		//MULTIPLE UPLOAD
         }
 
         if($this->file_count>0){
-            for($i=0; $i<$this->file_count; $i++){
-                if($base_name=='' && $this->UseRandomName){         //If no base name provided use random file name
-                    list($usec, $sec) = explode(' ', microtime());
-                    $seed= (float) $sec + ((float) $usec * 100000);
-                    srand($seed);
-                    $randval = rand();
-                    $base_name=md5($randval.date('Y-m-d'));
-                }
+            if($this->UseRandomName){
+                list($usec, $sec) = explode(' ', microtime());
+                $seed= (float) $sec + ((float) $usec * 100000);
+                srand($seed);
+                $randval = rand();
+                $base_name=md5($randval.date('Y-m-d'));
+            }
 
+            for($i=0; $i<$this->file_count; $i++){
                 $base_file_name=($base_name=="")?"":$base_name."_".($i+$base_count);
                 if($this->isMultiple){
                     $this->file_resource=$f_resource;
@@ -270,6 +270,30 @@ class MU{		//MULTIPLE UPLOAD
   // METHODS, FILE UPLOADING
   /////////////////////////////////////////////////
 
+    private function unifyFileName($fname="",$updir="",$ext=""){
+        if($fname==""){
+            return "";
+        }
+        $path_parts = pathinfo($fname);
+
+        if(isset($path_parts['extension']) && $path_parts['extension']!=""){
+            $ext=$path_parts['extension'];  //Try to get path from file name
+        }
+
+        $fileName_a = $path_parts['filename'];
+
+        $updir=rtrim($updir,'/\\');
+
+        $new_name=$fileName_a;
+
+        $count=1;
+        while (file_exists($updir . DIRECTORY_SEPARATOR . $new_name . ".".$ext)){
+            $new_name=$fileName_a."_$count";
+            $count++;
+        }
+        return $new_name. ".".$ext;
+    }
+
     /**
      * Upload a file with a target name. If the file is
      * not upload successfully then it returns error number.  Use the mu_error()
@@ -330,7 +354,7 @@ class MU{		//MULTIPLE UPLOAD
 
   /**
    * Upload all files in file resource and generate the error_no variable. if files
-   * not upload successfully then it returns 0. upon successfull upload returns 1
+   * not upload successfully then it returns 0. upon successful upload returns 1
    * use mu_error method variable to view description of the error.
    * @return int
    */	
@@ -342,15 +366,22 @@ class MU{		//MULTIPLE UPLOAD
 		}
 		else{
 			for($i=0; $i<$this->file_count; $i++){
-				if($this->file_resource['name'][$i]!='')
+				if($this->file_resource['name'][$i]!=''){
+                    if($this->target_file_names[$i]==""){
+                        $this->target_file_names[$i]=$this->source_file_names[$i];
+                    }
+
+                    if(!$this->overwrite){
+                        $this->target_file_names[$i]=$this->unifyFileName($this->target_file_names[$i],$this->uploaddir,$this->extenssions[$i]);
+                    }
 					$this->error_no[$i]=$this->upload_file($this->file_resource['tmp_name'][$i],$this->target_file_names[$i],$this->extenssions[$i],$this->uploaddir);
-				else 
+                }else{
 					$this->error_no[$i]=4;
+                }
 				if($this->error_no[$i]!=0)
 					$success_value=0;
 			}
-			return $success_value;
 		}
-			
+		return $success_value;
 	}	
 }
