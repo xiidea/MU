@@ -291,7 +291,7 @@ class MU{		//MULTIPLE UPLOAD
             $new_name=$fileName_a."_$count";
             $count++;
         }
-        return $new_name. ".".$ext;
+        return $new_name;//. ".".$ext;
     }
 
     /**

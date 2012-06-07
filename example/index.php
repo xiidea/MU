@@ -9,7 +9,7 @@
 if(isset($_POST['submit'])){
 	include("../src/class.mu.php");
 	$out_put="";
-	$obj = new MU($_FILES['myfile'],'file_name');
+	$obj = new MU($_FILES['myfile']);
 	
 	$fselected=$obj->get_value('file_selected');
 	if($fselected>0)
