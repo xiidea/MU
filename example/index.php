@@ -11,18 +11,21 @@ if(isset($_POST['submit'])){
 	$out_put="";
 	$obj = new MU($_FILES['myfile']);
 	
-	$fselected=$obj->get_value('file_selected');
+	$fselected=$obj->getFileSelected();
 	if($fselected>0)
 	{ 
-		$obj->denyed_extentions=array(".php",".html",".js",".htm",".htmls",".dhtml",".php3",".phps",".php4",".php5",".asp",".aspx",".htaccess",".vb",".htpasswd");
-		$obj->uploaddir=".".DIRECTORY_SEPARATOR."upload".DIRECTORY_SEPARATOR;
-		
-		$obj->upload_files();
+		$obj
+            ->setDeniedExtensions(array(
+            ".php",".html",".js",".htm",".htmls",".dhtml",".php3",".phps",".php4",".php5",".asp",".aspx",".htaccess",".vb",".htpasswd"))
+            ->setUploadDir(".".DIRECTORY_SEPARATOR."upload".DIRECTORY_SEPARATOR)
+            ->upload_files();
+
 		$up_error=$obj->mu_error();
 		
 		$file_name=$obj->uploaded_files();
 		$file_details=$obj->uploaded_files_details();
-		if($file_name!=''){
+
+        if($file_name!=''){
 			$j=0;
 			$error_str='';
 			for($fcount=0; $fcount<count($_FILES['myfile']['error']); $fcount++){
